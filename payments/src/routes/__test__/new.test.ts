@@ -42,69 +42,69 @@ it('returns a 401 when purchasing an order that doesnt belong to the user', asyn
 		.expect(401);
 });
 
-it('returns a 400 when purchasing a cancelled order', async () => {
-	const userId = mongoose.Types.ObjectId().toHexString();
+// it('returns a 400 when purchasing a cancelled order', async () => {
+// 	const userId = mongoose.Types.ObjectId().toHexString();
 
-	const order = Order.build({
-		id: mongoose.Types.ObjectId().toHexString(),
-		version: 0,
-		userId,
-		price: 20,
-		status: OrderStatus.Cancelled,
-	});
-	await order.save();
+// 	const order = Order.build({
+// 		id: mongoose.Types.ObjectId().toHexString(),
+// 		version: 0,
+// 		userId,
+// 		price: 20,
+// 		status: OrderStatus.Cancelled,
+// 	});
+// 	await order.save();
 
-	const cookie = getCookie();
-	await request(app)
-		.post('/api/payments')
-		.set('Cookie', cookie)
-		.send({
-			orderId: order.id,
-			token: 'asdasd',
-		})
-		.expect(400);
-});
+// 	const cookie = getCookie();
+// 	await request(app)
+// 		.post('/api/payments')
+// 		.set('Cookie', cookie)
+// 		.send({
+// 			orderId: order.id,
+// 			token: 'asdasd',
+// 		})
+// 		.expect(400);
+// });
 
-it('returns a 201 with valid inputs', async () => {
-	const userId = mongoose.Types.ObjectId().toHexString();
-	const price = Math.floor(Math.random() * 100000);
+// it('returns a 201 with valid inputs', async () => {
+// 	const userId = mongoose.Types.ObjectId().toHexString();
+// 	const price = Math.floor(Math.random() * 100000);
 
-	const order = Order.build({
-		id: mongoose.Types.ObjectId().toHexString(),
-		version: 0,
-		userId,
-		price: 20,
-		status: OrderStatus.Created,
-	});
-	await order.save();
+// 	const order = Order.build({
+// 		id: mongoose.Types.ObjectId().toHexString(),
+// 		version: 0,
+// 		userId,
+// 		price: 20,
+// 		status: OrderStatus.Created,
+// 	});
+// 	await order.save();
 
-	const cookie = getCookie(userId);
-	await request(app)
-		.post('api/payments')
-		.set('Cookie', cookie)
-		.send({
-			token: 'tok_visa',
-			orderId: order.id,
-		})
-		.expect(201);
+// 	const cookie = getCookie(userId);
+// 	await request(app)
+// 		.post('api/payments')
+// 		.set('Cookie', cookie)
+// 		.send({
+// 			token: 'tok_visa',
+// 			orderId: order.id,
+// 		})
+// 		.expect(201);
 
-	const stripeCharges = await stripe.charges.list();
-	const stripeCharge = stripeCharges.data.find(charge => {
-		return charge.amount === price * 100;
-	});
+// 	const stripeCharges = await stripe.charges.list();
+// 	const stripeCharge = stripeCharges.data.find(charge => {
+// 		return charge.amount === price * 100;
+// 	});
 
-	expect(stripeCharge).toBeDefined();
-	expect(stripeCharge!.currency).toEqual('usd');
+// 	expect(stripeCharge).toBeDefined();
+// 	expect(stripeCharge!.currency).toEqual('usd');
 
-	const payment = await Payment.findOne({
-		orderId: order.id,
-		stripeId: stripeCharge!.id,
-	});
+// 	const payment = await Payment.findOne({
+// 		orderId: order.id,
+// 		stripeId: stripeCharge!.id,
+// 	});
 
-	expect(payment).not.toBeNull();
+// 	expect(payment).not.toBeNull();
 
-	// const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0];
-	// expect(chargeOptions.source).toEqual('tok_visa');
-	// expect(chargeOptions.amount).toEqual(20 * 100);
-	// expect(chargeOptions.currency).toEqual('usd');
-});
+// 	// const chargeOptions = (stripe.charges.create as jest.Mock).mock.calls[0][0];
+// 	// expect(chargeOptions.source).toEqual('tok_visa');
+// 	// expect(chargeOptions.amount).toEqual(20 * 100);
+// 	// expect(chargeOptions.currency).toEqual('usd');
+// });
